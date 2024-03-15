@@ -1,0 +1,376 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<!-- saved from url=(0045)https://lenidavis.neocities.org/createJIRAurl -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Create JIRA Cloud template URL</title>
+<style type="text/css">
+
+    body {font-family: Arial, sans-serif;background: white; color: black; width: 100%; height: 100%; word-wrap:break-word;}
+    form {margin: 0;}
+    h1 {line-height: 0.85em; border-bottom: 2px solid; margin-bottom: 0.33em; padding-bottom: 0;}
+    h4 {margin-bottom: 0;}
+
+    textarea, input {background: #EEF;}
+    #info {font-size: 0.75em;}
+    #result {clear:both;}
+    #footer {border-top: 1px solid #000; color: #999; font: italic 75% sans-serif; clear:both;}
+    #footer p {margin: 0 0 1em 0;}
+    #footer img {float: right; margin: 0 0 0.5em 2em;}
+    
+
+</style>
+    
+<script type="text/javascript">
+
+    //id's of elements on the page, the same key is used in the arguments of the url, see https://confluence.atlassian.com/display/JIRA060/Creating+Issues+via+direct+HTML+links
+	var info = ["jirabase", "pid","issuetype", "summary", "description", "customfield_11742", "components", "versions", "assignee", "labels"];
+    var extraComponents = 0;
+    var extraVersions = 0;
+    var extraLabels = 0;
+    
+ 
+function createURL() {
+  	var urlResult = document.getElementById("urlResult");
+    var copyResult = document.getElementById("resultCopy");
+	var url = null;    
+	var isNull = false;
+
+    // if the first 3 in the info array (Jira base url, project id, issue type) are null
+	for (var i = 0; i <= 2; i++) {
+        var obj = document.getElementById(info[i]);		
+        if (obj.value == ""){
+            document.getElementById(info[i]).style.background = "pink";
+            isNull = true; 
+            console.log("t"+i);
+        }
+        else {
+            document.getElementById(info[i]).style.background = "";
+            console.log("f"+i);
+        }
+    }
+    //if any one of the required fields was null
+    if (isNull == true){
+        copyResult.innerHTML = "URL can not be created because Jira base url, project id and/or issue type is null";
+        url = null;
+        urlResult.setAttribute("href", url);
+        urlResult.innerHTML = url;
+        return2; //stop processing    
+    }
+        
+    //code did not force quit so create the URL
+
+    //start the base of the URL
+    var urlObj = document.getElementById(info[0]);		
+    url = urlObj.value + "/secure/CreateIssueDetails!init.jspa?";
+
+    //add the arguments to the URL if not null
+	for (var i = 1; i < info.length; i++) {
+
+        var obj = document.getElementById(info[i]);		
+        var unencoded = obj.value;
+        obj.value = encodeURIComponent(unencoded).replace(/'/g,"%27").replace(/"/g,"%22");
+
+        if (obj.value != ""){
+            if (i == 1) {
+                    url = url+info[i]+"="+obj.value;
+            }
+            else {
+                 url = url+"&"+info[i]+"="+obj.value;
+            }     
+
+            //keep the input fields as is (uncoded text)
+            obj.value = decodeURIComponent(unencoded.replace(/\+/g,  " "));             
+        }
+        
+	}
+    
+    
+    //add to URL if extra input boxes were used for components, versions, and labels
+    if (extraComponents > 0) {   
+        for (var i=1; i <= extraComponents; i++){
+            var obj = document.getElementById("components"+i);	    
+            if (obj.value != ""){
+                var unencoded = obj.value;
+                obj.value = encodeURIComponent(unencoded).replace(/'/g,"%27").replace(/"/g,"%22");
+                url = url+ "&components="+obj.value;
+                //keep the input fields as is (uncoded text)
+                obj.value = decodeURIComponent(unencoded.replace(/\+/g,  " "));
+            }
+        }
+    }
+    if (extraVersions > 0) {   
+        for (var i=1; i <= extraVersions; i++){
+            console.log("extra identified");
+            var obj = document.getElementById("versions"+i);	            
+            if (obj.value != ""){
+                var unencoded = obj.value;
+                obj.value = encodeURIComponent(unencoded).replace(/'/g,"%27").replace(/"/g,"%22");
+                url = url+ "&versions="+obj.value;
+                //keep the input fields as is (uncoded text)
+                obj.value = decodeURIComponent(unencoded.replace(/\+/g,  " "));
+            }
+        }
+    }
+    if (extraLabels > 0) {   
+        for (var i=1; i <= extraLabels; i++){
+            console.log("extra identified");
+            var obj = document.getElementById("labels"+i);	            
+            if (obj.value != ""){
+                var unencoded = obj.value;
+                obj.value = encodeURIComponent(unencoded).replace(/'/g,"%27").replace(/"/g,"%22");
+                url = url+ "&labels="+obj.value;
+                //keep the input fields as is (uncoded text)
+                obj.value = decodeURIComponent(unencoded.replace(/\+/g,  " "));
+            }
+        }
+    }
+    
+    if (url != null){	
+        copyResult.innerHTML = "Now visit and bookmark this URL:";
+        urlResult.setAttribute("href", url);
+        urlResult.innerHTML = url;
+    }	
+	
+} //end of createURL()
+    
+    
+// insert test URL data    
+function prefillURLdata(){    
+
+    document.getElementById("originalurl").value = "https://razorfish-east.atlassian.net/secure/CreateIssueDetails!init.jspa?pid=15421&issuetype=1&summary=Feature%20Name&description=*Test%20Data*%20%0A%0A%0A*Pre-conditions*%20%0A%0A%0A*Steps%20to%20reproduce*%20%0A%23%20%0A%23%20%0A%23%20%0A%0A%0A*Actual%20Result*%20%0A%0A%0A*Expected%20Result*%20%0A%0A%0A*Environment*%20%0A%0A%0A*Annotations*%0A%5B.pdf%7Curl%5D%0APage%20X%2C%20Note%20Y%3A&components=16163&versions=20284&assignee=lenidavis&labels=batch1&components=16162&versions=20285&labels=uat&customfield_11742=PWNR-3766";
+    
+}
+ 
+    
+// insert test ticket data    
+function prefillTestData(){
+    document.getElementById("jirabase").value = "https://razorfish-east.atlassian.net";
+    document.getElementById("pid").value = "15421";
+    document.getElementById("issuetype").value = "1";
+	document.getElementById("summary").value = "Feature Name";
+	document.getElementById("customfield_11742").value = "PWNR-3766";
+    document.getElementById("components").value = "16163";
+    document.getElementById("versions").value = "20285";
+    document.getElementById("assignee").value = "lenidavis";
+    document.getElementById("labels").value = "batch1"; 
+    prefillTemplate();    
+}
+    
+// insert the template of the description    
+function prefillTemplate(){    
+    document.getElementById("description").value =  "*Test Data* \n\n\n" +
+                                                    "*Pre-conditions* \n\n\n" +
+                                                    "*Steps to reproduce* \n# \n# \n# \n\n\n" +
+                                                    "*Actual Result* \n\n\n" +
+                                                    "*Expected Result* \n\n\n" +
+                                                    "*Environment* \n\n\n" +
+													"*Browser, OS, Device* \n\n\n" +
+                                                    "*Requirement*\n" +
+                                                    "URL\n" + 
+                                                    "#";
+}
+    
+    
+//show extra input boxes for more components, versions, and labels
+function addComponent(){ 
+    extraComponents++;    
+    var div = document.createElement("div");
+    div.innerHTML = '<input type="text" placeholder="Enter another component" id="components'+ extraComponents +'"></input>';
+    document.getElementById("moreComponents").appendChild(div);
+}
+function addVersions(){ 
+    extraVersions++;    
+    var div = document.createElement("div");
+    div.innerHTML = '<input type="text" placeholder="Enter another version" id="versions'+ extraVersions +'"></input>';
+    document.getElementById("moreVersions").appendChild(div);    
+}
+function addLabels(){ 
+    extraLabels++;    
+    var div = document.createElement("div");
+    div.innerHTML = '<input type="text" placeholder="Enter another label" id="labels'+ extraLabels +'" size="100"></input>';
+    document.getElementById("moreLabels").appendChild(div);
+}    
+        
+    
+    
+function decodeURL() {
+	var obj = document.getElementById("originalurl");
+	var url = obj.value;
+	var decodedURL = decodeURIComponent(url.replace(/\+/g,  " "));
+
+    // if URL to decode is null
+    if (obj.value == ""){
+        console.log("trigger error"); 
+        document.getElementById("originalurl").style.background = "pink";
+        url = null;
+        return2; //stop processing if null
+    }
+    else{
+        document.getElementById("originalurl").style.background = "";
+    }
+
+    //code did not force quit so decode the URL 
+    
+    for (i=0; i < info.length; i++){        
+        if (i == 0){
+            // get the JIRA base url
+            var base = url.split("/secure/CreateIssueDetails");
+            document.getElementById(info[0]).value = base[0];
+        }
+        // get the value of the other keys in the info array, if the key exists in the url
+        else if (url.indexOf(info[i]) > -1){
+            var a = decodedURL.split(info[i]+"=");                
+            var b = a[1].split("&",1); 
+            document.getElementById(info[i]).value = b;            
+        }
+    }
+    
+    // count how many times they show in the URL
+    var componentsCount = (url.match(/components/g) || []).length;
+    var versionsCount = (url.match(/versions/g) || []).length;
+    var labelsCount = (url.match(/labels/g) || []).length;
+    
+    if (componentsCount > 1){
+        var y;
+        for (var j=1; j < componentsCount; j++){
+            //for the components after the first one, show another input box, with the value inside it
+            var x = url.split("components=");       
+            for (var k=2;k<x.length;k++){
+                y = x[k].split("&",1);            
+                extraComponents++;    
+                var div = document.createElement("div");
+                div.innerHTML = '<input type="text" id="components'+ extraComponents +'" value="'+y+'"></input>';
+                document.getElementById("moreComponents").appendChild(div);
+            }                                    
+        }
+    }
+    if (versionsCount > 1){
+        var y;
+        for (var j=1; j < versionsCount; j++){
+            //for the versions after the first one, show another input box, with the value inside it        
+            var x = url.split("versions=");       
+            for (var k=2;k<x.length;k++){
+                y = x[k].split("&",1);            
+                extraVersions++;    
+                var div = document.createElement("div");
+                div.innerHTML = '<input type="text" id="versions'+ extraVersions +'" value="'+y+'"></input>';
+                document.getElementById("moreVersions").appendChild(div);
+            }                                    
+        }
+    }
+    if (labelsCount > 1){
+        var y;
+        for (var j=1; j < labelsCount; j++){
+            //for the labels after the first one, show another input box, with the value inside it        
+            var x = url.split("labels=");       
+            for (var k=2;k<x.length;k++){
+                y = x[k].split("&",1);            
+                extraLabels++;    
+                var div = document.createElement("div");
+                div.innerHTML = '<input type="text" id="labels'+ extraLabels +'" value="'+y+'"></input>';
+                document.getElementById("moreLabels").appendChild(div);
+            }                                    
+        }
+    } 
+} // end of decodeURL()
+    
+</script>
+<style type="text/css">iframe#teal-job-tracker-iframe-stable {
+    min-width: 380px !important;
+    width: 380px !important;
+    min-height: 100vh !important;
+    height: 100vh !important;
+  }
+
+  @media print {
+    #teal-job-tracker-root-stable, #teal-job-tracker-companion-root-stable {
+      display: none !important;
+    }
+  }</style></head>
+<body>
+    
+
+<form onsubmit="return false;">
+<h1>Create JIRA Cloud template URL</h1>
+
+    <p>
+        JIRA lets you <a href="https://confluence.atlassian.com/display/JIRAKB/Creating+Issues+via+direct+HTML+links">create issues via direct HTML links</a>. This tool makes creating those links easier.
+    </p>
+    
+    <input type="button" onclick="prefillURLdata()" value="Example JIRA URL to decode">
+    <input type="button" onclick="prefillTestData()" value="Example data to create ticket">
+
+    <hr>
+    <h2>Decode a URL</h2> 
+    <input type="text" id="originalurl" size="70">
+    <input type="button" onclick="decodeURL()" value="Decode this URL">
+    <br>
+<br>
+    <hr> 
+    
+    <h2>Generate a URL</h2> 
+    
+    <h4>JIRA base*</h4>
+    <input type="text" id="jirabase" size="100" placeholder="The URL of your JIRA, e.g. https://razorfish-east.atlassian.net">
+    <h4>Project id*</h4>
+    <input type="text" id="pid" size="100" placeholder="Visit the project space &gt; view the source &gt; find &#39;pid=&#39;, the value is the project id">
+    <h4>Issue type* <span id="info" title="Other issue types: Administration &gt; Issue Settings &gt; Issue Types &gt; hover over Edit &gt; the value of &#39;id=&#39; is the issue type id">other issue types?</span></h4>
+     
+    <input type="text" id="issuetype" size="100" placeholder="Standard JIRA issue type values are 1=Bug, 2=New Feature, 3=Task, 4=Improvement">
+    <h4>Summary</h4>
+    <textarea cols="100" rows="2" id="summary"></textarea>
+    <h4>Description <input type="button" onclick="prefillTemplate()" value="Template"></h4>
+    <span id="info">    
+    <a href="https://jira.atlassian.com/secure/WikiRendererHelpAction.jspa?section=all" target="blank">JIRA text formatting</a>, eg use # for a numbered list </span> <br>
+    <textarea cols="100" rows="18" id="description" placeholder="Enter as you would in JIRA"></textarea>
+    <h4>Ford custom Epic</h4>
+    <input type="text" id="customfield_11742" size="100" placeholder="Enter Jira ticket ID of the Epic">
+	<h4>Component <input type="button" value="+" onclick="addComponent()"></h4>
+    <input type="text" id="components" size="100" placeholder="Project space &gt; Components &gt; hover over component name &gt; component id is the number after &#39;/component/&#39;">
+    <br>
+    <div id="moreComponents">
+    </div>    
+    <h4>Affects Version <input type="button" value="+" onclick="addVersions()"></h4> 
+    <input type="text" id="versions" size="100" placeholder="Project space &gt; Versions &gt; hover over version name &gt; version id is the number after &#39;/fixforversion/&#39;">  
+    <br>    
+    <div id="moreVersions">
+    </div>    
+    <h4>Assignee</h4> 
+    <input type="text" id="assignee" size="100" placeholder="Someone&#39;s username, which you can find on their profile by clicking their name">
+    <br>
+    <h4>Label <input type="button" value="+" onclick="addLabels()"></h4>
+    <input type="text" id="labels" size="100" placeholder="Text, no spaces">    
+    <br>    
+    <div id="moreLabels">
+    </div>    
+    <br>    
+ <br>  
+
+
+<div id="result">
+<input type="button" onclick="createURL()" value="Create url">
+<hr>
+<h4 id="resultCopy">The custom url will appear here</h4>
+<a id="urlResult" href="https://lenidavis.neocities.org/createJIRAurl" target="blank"></a>
+</div>
+
+</form>
+
+
+<br>
+<br>
+<br>
+<br>
+
+<div id="footer">
+    <p>version 1.0, <span title="Sorry, not sorry">built for Chrome</span><br>
+    Built for JIRA version 6.5-OD-01, check here for the <a href="https://confluence.atlassian.com/display/Cloud/Application+Versions" target="_blank">latest version of JIRA cloud</a>
+    <br>
+<a href="mailto:leni.davis@razorfish.com?Subject=Create%20JIRA%20url%20template%20v1.0" target="_top">Issues, questions, improvements</a>
+    <br>
+Original decoder tool <a href="http://meyerweb.com/eric/tools/dencoder/" target="blank">http://meyerweb.com/eric/tools/dencoder/</a>
+</p>
+</div>
+
+
+<div id="teal-job-tracker-root-stable" style="z-index: 2147483647;"><iframe id="teal-job-tracker-iframe-stable" style="background: rgb(255, 255, 255) !important; width: 380px !important; height: 100vh !important; position: fixed !important; inset: 0px -380px auto auto !important; z-index: 2147483647 !important; border: 0px !important; box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 16px -3px !important; transition: right 0.25s ease-in-out 0s !important; transform: none !important;" src="./jira_files/saved_resource.html"></iframe></div><div id="teal-job-tracker-companion-root-stable" style="display: block; z-index: 2147483646; bottom: 58px; right: 0px; position: fixed; height: 60px; width: auto;"></div></body></html>
